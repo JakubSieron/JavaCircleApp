@@ -1,6 +1,4 @@
-
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
@@ -8,37 +6,49 @@ import java.awt.*;
  */
 public class ControlPanel extends JPanel {
 
-    private final CirclePanel circlePanel; // reference to the drawing panel
+    private final CirclePanel circlePanel;
+
+    private int red = 0;
+    private int green = 0;
+    private int blue = 0;
 
     public ControlPanel(CirclePanel circlePanel) {
         this.circlePanel = circlePanel;
 
-        // Use vertical layout for stacking controls
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(180, 400));
         setBorder(BorderFactory.createTitledBorder("Controls"));
 
-        // Create and configure the diameter slider
+        // Diameter slider
         JSlider diameterSlider = new JSlider(10, 300, 100);
         setupSlider(diameterSlider, "Diameter");
         diameterSlider.addChangeListener(e -> circlePanel.setDiameter(diameterSlider.getValue()));
 
-        // RED color slider
+        // Red slider
         JSlider redSlider = new JSlider(0, 255, 0);
         setupSlider(redSlider, "Red");
-        redSlider.addChangeListener(e -> updateColor(redSlider, null, null));
+        redSlider.addChangeListener(e -> {
+            red = redSlider.getValue();
+            updateColor();
+        });
 
-        // GREEN color slider
+        // Green slider
         JSlider greenSlider = new JSlider(0, 255, 0);
         setupSlider(greenSlider, "Green");
-        greenSlider.addChangeListener(e -> updateColor(null, greenSlider, null));
+        greenSlider.addChangeListener(e -> {
+            green = greenSlider.getValue();
+            updateColor();
+        });
 
-        // BLUE color slider
+        // Blue slider
         JSlider blueSlider = new JSlider(0, 255, 0);
         setupSlider(blueSlider, "Blue");
-        blueSlider.addChangeListener(e -> updateColor(null, null, blueSlider));
+        blueSlider.addChangeListener(e -> {
+            blue = blueSlider.getValue();
+            updateColor();
+        });
 
-        // Dropdown menu for selecting language
+        // Language selection
         add(Box.createRigidArea(new Dimension(0, 10)));
         JLabel langLabel = new JLabel("Select Language:");
         add(langLabel);
@@ -49,13 +59,15 @@ public class ControlPanel extends JPanel {
         languageDropdown.setAlignmentX(Component.CENTER_ALIGNMENT);
         languageDropdown.addActionListener(e -> {
             String selected = (String) languageDropdown.getSelectedItem();
-            circlePanel.setLanguage(selected); // apply language choice
+            circlePanel.setLanguage(selected);
         });
-
         add(languageDropdown);
     }
 
-    // Helper method to format sliders with labels and tick marks
+    private void updateColor() {
+        circlePanel.setColor(red, green, blue);
+    }
+
     private void setupSlider(JSlider slider, String label) {
         slider.setMajorTickSpacing(slider.getMaximum() / 2);
         slider.setMinorTickSpacing(10);
@@ -68,12 +80,5 @@ public class ControlPanel extends JPanel {
         add(sliderLabel);
         add(slider);
     }
-
-    // Helper method to update color by checking which sliders were adjusted
-    private void updateColor(JSlider r, JSlider g, JSlider b) {
-        int red = r != null ? r.getValue() : circlePanel.getForeground().getRed();
-        int green = g != null ? g.getValue() : circlePanel.getForeground().getGreen();
-        int blue = b != null ? b.getValue() : circlePanel.getForeground().getBlue();
-        circlePanel.setColor(red, green, blue);
-    }
 }
+
